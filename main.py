@@ -23,6 +23,7 @@ atexit.register(save, h_len, histfile)
 def main():
     streamer = sd.OutputStream(samplerate=24000, channels=1, dtype='float32')
     streamer.start()
+    print(f"cuda support: {torch.cuda.is_available()}")
     pipeline = KPipeline(lang_code='a',repo_id='hexgrad/Kokoro-82M')
     voice = "af_heart"
     speed = 1
