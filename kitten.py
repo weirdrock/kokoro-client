@@ -1,6 +1,7 @@
 import torch
 import readline
-from kokoro import KPipeline
+from kittentts import KittenTTS
+import numpy as np
 import sounddevice as sd
 import atexit
 import readline
@@ -15,7 +16,7 @@ except FileNotFoundError:
 
 def save(prev_h_len, histfile):
     new_h_len = readline.get_current_history_length()
-    readline.set_history_length(1000000)
+    readline.set_history_length(1000)
     readline.append_history_file(new_h_len - prev_h_len, histfile)
 atexit.register(save, h_len, histfile)
 
@@ -23,9 +24,10 @@ atexit.register(save, h_len, histfile)
 def main():
     streamer = sd.OutputStream(samplerate=24000, channels=1, dtype='float32')
     streamer.start()
-    print(f"cuda support: {torch.cuda.is_available()}")
-    pipeline = KPipeline(lang_code='a',repo_id='hexgrad/Kokoro-82M')
-    voice = "af_heart"
+    # print(f"cuda support: {torch.cuda.is_available()}")
+    pipeline = KittenTTS("KittenML/kitten-tts-nano-0.1")
+    voice = "expr-voice-5-f"
+    # available_voices : [  'expr-voice-2-m', 'expr-voice-2-f', 'expr-voice-3-m', 'expr-voice-3-f',  'expr-voice-4-m', 'expr-voice-4-f', 'expr-voice-5-m', 'expr-voice-5-f' ]
     speed = 1
     vol_factor = 1
     while True:
@@ -40,8 +42,8 @@ def main():
             elif text.startswith('f='):
                 vol_factor = float(text.lstrip('f='))
                 continue
-            for _, _, audio in pipeline(text, voice=voice, speed=speed):
-                audio = torch.mul(audio, vol_factor)
+            audio = pipeline.generate(text, voice, speed)
+            audio = np.multiply(audio, vol_factor)
             streamer.write(audio)
         except (KeyboardInterrupt, SystemExit, EOFError):
             break

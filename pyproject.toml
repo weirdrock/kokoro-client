@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "kittentts",
     "kokoro",
     "misaki[en]>=0.9.4",
     "pip>=25.2",
@@ -18,3 +19,4 @@ dependencies = [
 
 [tool.uv.sources]
 kokoro = { git = "https://github.com/hexgrad/kokoro" }
+kittentts = { git = "https://github.com/KittenML/KittenTTS" }
